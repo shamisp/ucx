@@ -8,6 +8,7 @@
 #include "mpool.h"
 #include "queue.h"
 
+#include <sys/mman.h>
 #include <ucs/debug/log.h>
 #include <ucs/sys/math.h>
 
@@ -280,6 +281,10 @@ typedef struct ucs_mmap_mpool_chunk_hdr {
     size_t size;
 } ucs_mmap_mpool_chunk_hdr_t;
 
+#if !defined(MAP_ANONYMOUS) && defined(MAP_ANON)
+#   define MAP_ANONYMOUS MAP_ANON
+#endif
+
 void *ucs_mpool_chunk_mmap(size_t *size, void *mp_context UCS_MEMTRACK_ARG)
 {
     ucs_mmap_mpool_chunk_hdr_t *chunk;
@@ -311,9 +316,11 @@ typedef struct ucs_hugetlb_mpool_chunk_hdr {
 void* ucs_mpool_hugetlb_malloc(size_t *size, void *mp_context UCS_MEMTRACK_ARG)
 {
     ucs_hugetlb_mpool_chunk_hdr_t *chunk;
-    void *ptr;
-    ucs_status_t status;
     size_t real_size;
+
+#if SHM_HUGETLB
+    ucs_status_t status;
+    void *ptr;
     int shmid;
 
     /* First, try hugetlb */
@@ -324,6 +331,7 @@ void* ucs_mpool_hugetlb_malloc(size_t *size, void *mp_context UCS_MEMTRACK_ARG)
         chunk->hugetlb = 1;
         goto out_ok;
     }
+#endif
 
     /* Fallback to glibc */
     real_size = *size;

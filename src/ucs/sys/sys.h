@@ -17,14 +17,13 @@
 #include <ucs/type/status.h>
 #include <ucs/debug/memtrack.h>
 
-#include <linux/stddef.h>
+#include <stddef.h>
 #include <errno.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <sys/fcntl.h>
-#include <sys/epoll.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <sys/param.h>

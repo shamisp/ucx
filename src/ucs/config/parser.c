@@ -597,7 +597,7 @@ void ucs_config_help_array(char *buf, size_t max, const void *arg)
 
 int ucs_config_sscanf_table(const char *buf, void *dest, const void *arg)
 {
-    char *tokens = strdupa(buf);
+    char *tokens = strdup(buf);
     char *token, *saveptr1;
     char *name, *value, *saveptr2;
     ucs_status_t status;
@@ -611,6 +611,7 @@ int ucs_config_sscanf_table(const char *buf, void *dest, const void *arg)
         value = strtok_r(NULL,  "=", &saveptr2);
         if (value == NULL) {
             ucs_error("Could not parse list of values in '%s' (token: '%s')", buf, token);
+            free(tokens);
             return 0;
         }
 
@@ -623,12 +624,14 @@ int ucs_config_sscanf_table(const char *buf, void *dest, const void *arg)
                 ucs_debug("Failed to set %s to '%s': %s", name, value,
                           ucs_status_string(status));
             }
+            free(tokens);
             return 0;
         }
 
         token = strtok_r(NULL, ";", &saveptr1);
     }
 
+    free(tokens);
     return 1;
 }
 

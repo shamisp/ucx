@@ -188,6 +188,7 @@ int ucs_get_first_cpu()
     }
     total_cpus = ret;
 
+#if HAVE_LINUX_CPU_AFFINITY
     CPU_ZERO(&mask);
     ret = sched_getaffinity(0, sizeof(mask), &mask);
     if (ret < 0) {
@@ -200,6 +201,7 @@ int ucs_get_first_cpu()
             return first_cpu;
         }
     }
+#endif
 
     return total_cpus;
 }

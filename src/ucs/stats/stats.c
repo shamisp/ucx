@@ -260,20 +260,21 @@ static void* ucs_stats_thread_func(void *arg)
 static void ucs_stats_open_dest()
 {
     ucs_status_t status;
-    char *copy_str, *saveptr;
-    const char *hostname, *port_str;
     const char *next_token;
     int need_close;
 
     if (!strncmp(ucs_global_opts.stats_dest, "udp:", 4)) {
+        char *copy_str = NULL, *saveptr = NULL;
+        const char *hostname = NULL, *port_str = NULL;
 
-        copy_str = strdupa(&ucs_global_opts.stats_dest[4]);
+        copy_str = strdup(&ucs_global_opts.stats_dest[4]);
         saveptr  = NULL;
         hostname = strtok_r(copy_str, ":", &saveptr);
         port_str = strtok_r(NULL,     ":", &saveptr);
 
         if (hostname == NULL) {
            ucs_error("Invalid statistics destination format (%s)", ucs_global_opts.stats_dest);
+           free(copy_str);
            return;
         }
 
@@ -281,6 +282,7 @@ static void ucs_stats_open_dest()
                                       port_str ? atoi(port_str) : UCS_STATS_DEFAULT_UDP_PORT,
                                       &ucs_stats_context.client);
         if (status != UCS_OK) {
+            free(copy_str);
             return;
         }
 
