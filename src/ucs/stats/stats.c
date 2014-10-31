@@ -287,6 +287,7 @@ static void ucs_stats_open_dest()
         }
 
         ucs_stats_context.flags |= UCS_STATS_FLAG_SOCKET;
+        free(copy_str);
     } else if (strcmp(ucs_global_opts.stats_dest, "") != 0) {
         status = ucs_open_output_stream(ucs_global_opts.stats_dest,
                                        &ucs_stats_context.stream,
